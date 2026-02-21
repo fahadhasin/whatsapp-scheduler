@@ -1,0 +1,30 @@
+[
+  {
+    "id": "morning-greeting",
+    "to": "919XXXXXXXXXX",
+    "message": "Good morning! Have a great day \u2764\ufe0f",
+    "cron": "0 7 * * *",
+    "enabled": true
+  },
+  {
+    "id": "weekly-checkin",
+    "to": "919XXXXXXXXXX",
+    "message": "Hey, how's it going? Been a while!",
+    "cron": "0 10 * * 1",
+    "enabled": true
+  },
+  {
+    "id": "daily-motivation",
+    "to": "919XXXXXXXXXX",
+    "message": "Happy {{day}}! {{random:Stay focused today|You've got this|Make it count|One step at a time}} \ud83d\udcaa",
+    "cron": "0 8 * * *",
+    "enabled": false
+  },
+  {
+    "id": "group-reminder",
+    "to": "group:My Group Name",
+    "message": "Reminder: Family call today at 7 PM! \ud83d\udcde ({{date}})",
+    "cron": "0 17 * * 0",
+    "enabled": false
+  }
+]

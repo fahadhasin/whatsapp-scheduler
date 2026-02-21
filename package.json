@@ -1,0 +1,20 @@
+{
+  "name": "whatsapp-scheduler",
+  "version": "1.0.0",
+  "description": "Schedule WhatsApp messages from a JSON config using node-cron and whatsapp-web.js",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js start",
+    "send": "node src/index.js send",
+    "list": "node src/index.js list",
+    "status": "node src/index.js status"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "node-cron": "^3.0.3",
+    "whatsapp-web.js": "^1.26.1-alpha.1",
+    "winston": "^3.14.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

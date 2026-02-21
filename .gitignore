@@ -1,0 +1,9 @@
+node_modules/
+.wwebjs_auth/
+.wwebjs_cache/
+logs/
+package-lock.json
+.DS_Store
+
+# If your schedules.json contains real phone numbers, add it here:
+# schedules.json
