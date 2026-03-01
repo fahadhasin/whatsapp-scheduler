@@ -14,6 +14,7 @@ Works on Linux, macOS, Windows, or any cloud VPS.
 - **Auto-reconnect** — recovers from WhatsApp Web disconnections automatically
 - **Structured logging** — all sends and errors logged to `logs/`
 - **Background service support** — run as a persistent daemon on Linux (systemd), macOS (launchd), or Windows (PM2)
+- **Telegram bot interface** *(optional)* — schedule messages via natural language from your phone, powered by a local LLM (see [Telegram Bridge](#telegram-bridge-optional))
 
 ## Requirements
 
@@ -260,6 +261,77 @@ One thing to note: whatsapp-web.js runs a headless Chromium browser in the backg
 - **Serverless platforms** (AWS Lambda, Google Cloud Functions, Vercel, etc.) — these spin up on demand and shut down after each request. There's no way to run a persistent process or maintain a WhatsApp session.
 - **Free-tier services that sleep on inactivity** (Render free tier, Railway free tier, Fly.io free tier) — the process gets paused when idle, which breaks the WhatsApp session and causes missed messages.
 
+## Telegram Bridge *(optional)*
+
+The `telegram-bridge/` directory contains a Python bot that lets you schedule WhatsApp messages by sending natural language instructions to a private Telegram bot — no need to edit JSON files by hand.
+
+> "Send 'Happy birthday!' to John tomorrow at 9am"
+> "Remind the team about standup every Monday at 8:45am"
+
+The bot parses your message using a local LLM (Ollama), writes the schedule entry, and restarts the scheduler — all from your phone.
+
+### How it works
+
+1. You send a message to your private Telegram bot
+2. The bridge calls Ollama (locally) to extract recipient, message text, date/time, and recurrence
+3. It looks up the recipient in your contacts list and appends the entry to `schedules.json`
+4. It restarts the WhatsApp scheduler service to pick up the new schedule
+
+### Prerequisites
+
+- Python 3.10+
+- [Ollama](https://ollama.com) running on the same host as the scheduler: `ollama pull llama3.2:1b`
+- A Telegram bot token from [@BotFather](https://t.me/BotFather)
+- Your Telegram user ID from [@userinfobot](https://t.me/userinfobot)
+
+### Setup
+
+```bash
+cd telegram-bridge
+cp .env.example .env
+# Fill in TELEGRAM_BOT_TOKEN and ALLOWED_USER_ID
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+```
+
+Deploy to your host:
+
+```bash
+./deploy.sh   # rsync + venv install + systemd enable
+```
+
+### Bot commands
+
+| Command | Description |
+|---|---|
+| Just type naturally | Schedule a one-time or recurring message via NLP |
+| `/list` | Show all active schedules |
+| `/cancel <id>` | Remove a schedule by ID |
+| `/contacts` | List known contacts |
+| `/start` | Show help |
+
+### Running as a service
+
+The bridge runs as a separate systemd service alongside the scheduler:
+
+```bash
+sudo cp whatsapp-telegram-bridge.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now whatsapp-telegram-bridge
+```
+
+### Configuration
+
+| Env var | Default | Description |
+|---|---|---|
+| `TELEGRAM_BOT_TOKEN` | *(required)* | Bot token from BotFather |
+| `ALLOWED_USER_ID` | *(required)* | Your Telegram user ID — bot ignores all other users |
+| `WHATSAPP_SCHEDULER_DIR` | `~/whatsapp-scheduler/` | Path to the scheduler directory |
+| `OLLAMA_URL` | `http://localhost:11434/api/generate` | Ollama API endpoint |
+| `OLLAMA_MODEL` | `llama3.2:1b` | Model for NLP parsing (1b is sufficient and fast) |
+
+---
+
 ## Logs
 
 | File | Contents |
@@ -286,6 +358,15 @@ whatsapp-scheduler/
 │   ├── scheduler.js    # Cron job manager
 │   ├── templates.js    # Template variable rendering
 │   └── logger.js       # Winston logger setup
+├── telegram-bridge/    # Optional Telegram bot interface
+│   ├── bot.py          # Telegram bot entry point
+│   ├── nlp.py          # Natural language parsing via Ollama
+│   ├── scheduler_bridge.py  # Reads/writes schedules.json
+│   ├── contacts.py     # Contact lookup helpers
+│   ├── deploy.sh       # Rsync + systemd deploy script
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── whatsapp-telegram-bridge.service
 ├── schedules.json      # Your message schedules
 ├── whatsapp-scheduler.service  # systemd unit file
 └── logs/               # Auto-created, git-ignored
@@ -293,10 +374,15 @@ whatsapp-scheduler/
 
 ## Tech stack
 
+**Scheduler (Node.js)**
 - [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) — WhatsApp Web automation
 - [node-cron](https://github.com/node-cron/node-cron) — cron scheduling
 - [winston](https://github.com/winstonjs/winston) — logging
 - [commander](https://github.com/tj/commander.js) — CLI
+
+**Telegram Bridge (Python)**
+- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) — Telegram bot framework
+- [Ollama](https://ollama.com) — local LLM inference (llama3.2:1b) for NLP parsing
 
 ## License
 
