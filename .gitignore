@@ -7,3 +7,11 @@ package-lock.json
 
 # If your schedules.json contains real phone numbers, add it here:
 # schedules.json
+
+# contacts.json contains personal phone numbers — never commit
+contacts.json
+
+# Telegram bridge
+telegram-bridge/venv/
+telegram-bridge/__pycache__/
+telegram-bridge/.env
