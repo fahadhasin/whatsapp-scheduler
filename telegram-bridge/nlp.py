@@ -1,13 +1,14 @@
 import json
 import logging
+import os
 import re
 import urllib.request
 from datetime import date, datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-OLLAMA_URL = 'http://localhost:11434/api/generate'
-OLLAMA_MODEL = 'llama3.2:1b'
+OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434/api/generate')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.2:1b')
 
 
 def _next_weekday(weekday: int) -> date:

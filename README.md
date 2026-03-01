@@ -127,11 +127,9 @@ For scheduled messages to fire reliably, this process needs to run continuously 
 
 ---
 
-### Recommended: Raspberry Pi or always-on Linux machine (systemd)
+### Recommended: Always-on Linux machine (systemd)
 
-A Raspberry Pi is the ideal host for this kind of tool. It draws around 3–5W of power, runs silently, costs almost nothing to keep on permanently, and Linux's built-in service manager (systemd) handles starting the process on boot, restarting it on failure, and logging — all without any extra software.
-
-Any Pi model from the Pi 3 onwards is sufficient. A spare always-on Linux desktop or laptop works identically.
+An always-on Linux machine is the ideal host — a home server, a spare desktop or laptop running Linux, a Raspberry Pi, or a cloud VPS. Linux's built-in service manager (systemd) handles starting the process on boot, restarting it on failure, and logging — all without any extra software.
 
 **Step 1 — Install Node.js and Chromium**
 
@@ -182,10 +180,10 @@ sudo journalctl -u whatsapp-scheduler -f
 
 From this point on, the scheduler starts automatically whenever the machine boots. If the process crashes, systemd restarts it within 15 seconds. If WhatsApp disconnects mid-session, the built-in reconnect logic handles it.
 
-**Tips for running on a Raspberry Pi:**
-- Use Ethernet over Wi-Fi where possible — a wired connection is more stable for a long-running process
-- Use a quality power supply; underpowered supplies cause silent reboots that are hard to diagnose
-- If you're in an area with unreliable power, a small UPS (uninterruptible power supply) is worth it
+**Tips for long-running deployments:**
+- Use a wired Ethernet connection where possible — more stable than Wi-Fi for a persistent process
+- On a Raspberry Pi: use a quality power supply to avoid silent reboots from power instability
+- If power reliability is a concern, a small UPS (uninterruptible power supply) is worth it
 
 ---
 

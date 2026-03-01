@@ -521,7 +521,7 @@ def main() -> None:
     app.add_handler(CommandHandler('list', cmd_list, filters=auth))
     app.add_handler(CommandHandler('cancel', cmd_cancel_schedule, filters=auth))
 
-    logger.info(f"WhatsApp Telegram Bridge starting. Allowed user: {allowed_user_id}")
+    logger.info("WhatsApp Telegram Bridge starting")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
